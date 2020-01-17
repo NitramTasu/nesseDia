@@ -26,6 +26,23 @@ mixin _$HomeController on _HomeBase, Store {
     }, _$valueAtom, name: '${_$valueAtom.name}_set');
   }
 
+  final _$textAtom = Atom(name: '_HomeBase.text');
+
+  @override
+  String get text {
+    _$textAtom.context.enforceReadPolicy(_$textAtom);
+    _$textAtom.reportObserved();
+    return super.text;
+  }
+
+  @override
+  set text(String value) {
+    _$textAtom.context.conditionallyRunInAction(() {
+      super.text = value;
+      _$textAtom.reportChanged();
+    }, _$textAtom, name: '${_$textAtom.name}_set');
+  }
+
   final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
 
   @override
@@ -33,6 +50,16 @@ mixin _$HomeController on _HomeBase, Store {
     final _$actionInfo = _$_HomeBaseActionController.startAction();
     try {
       return super.increment();
+    } finally {
+      _$_HomeBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void loadText(String newText) {
+    final _$actionInfo = _$_HomeBaseActionController.startAction();
+    try {
+      return super.loadText(newText);
     } finally {
       _$_HomeBaseActionController.endAction(_$actionInfo);
     }

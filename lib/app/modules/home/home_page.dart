@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:mobx/mobx.dart';
+import 'package:nesse_dia/app/modules/home/home_repository.dart';
+
+import 'home_controller.dart';
+import 'home_module.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -9,15 +16,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var homeController = HomeController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: <Widget>[],
-      ),
-    );
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              RaisedButton(
+                child: Text("Request"),
+                onPressed: () =>
+                    {homeController.searchByThisDay("1 de janeiro")},
+              ),
+              Observer(
+                builder: (_) => Text('${homeController.text}'),
+              )
+            ],
+          ),
+        ));
   }
 }
