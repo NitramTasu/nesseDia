@@ -27,7 +27,7 @@ abstract class _HomeBase with Store {
     return titleResp;
   }
 
-  Future<Map<String, dynamic>> getContent(String title) {
+  Future<Map<String, dynamic>> getWikiPageContent(String title) {
     Dio dio = new Dio();
     var data = homeRepository.searchContent(dio, title);
     return data;
@@ -38,25 +38,38 @@ abstract class _HomeBase with Store {
   }
 
   String searchByThisDay(String title) {
-    var titleResp = getTitle("25 de janeiro");
-    titleResp.then((data) {
+    getTitle("25 de janeiro").then((data) {
       if (data.length > 0) {
-        var formatedTitle =
-            data[1][0].toString().replaceAll(new RegExp(r'\s'), '_');
-        var resp = getContent(formatedTitle);
-        resp.then((data) {
-          var unformattedText =
-              data["query"]["pages"]["10686"]["revisions"][0]["*"];
-          var splited = unformattedText
-              .toString()
-              .replaceAll(RegExp(r'\['), '')
-              .split(new RegExp(r'\*\s'));
-          loadText(unformattedText);
+        var formatedTitle = formatSuggestionTitle(data);
+        getWikiPageContent(formatedTitle).then((data) {
+          String facts = extractFacts(data);
+          loadText(facts);
         });
       }
     }, onError: (e) {
       print(e);
     });
+  }
+
+  String formatSuggestionTitle(var data) {
+    return data[1][0].toString().replaceAll(new RegExp(r'\s'), '_');
+  }
+
+  String extractFacts(var data) {
+    var unformattedText = data["query"]["pages"]["10686"]["revisions"][0]["*"];
+    var formatted = unformattedText
+        .toString()
+        .replaceAll(RegExp(r'\[+|\]+|{+|}+'), '')
+        .split(new RegExp(r'\*\s'));
+    formatted.removeAt(0);
+    final iReg = RegExp(r'(\d){4} — (.)+');
+
+    var reduced = formatted.reduce((t, e) => t + e);
+    return iReg
+        .allMatches(reduced)
+        .map((m) => m.group(0))
+        .toList()
+        .reduce((t, e) => '$t\n$e');
   }
 
   @action

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:mobx/mobx.dart';
-import 'package:nesse_dia/app/modules/home/home_repository.dart';
-
+import 'package:intl/intl.dart';
 import 'home_controller.dart';
-import 'home_module.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
   const HomePage({Key key, this.title = "Home"}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   var homeController = HomeController();
+  DateTime selectedDate = DateTime.now();
+
+  Future<Null> _selectDate(BuildContext context) async {
+    print(new DateFormat.MMMM().format(new DateTime.now()));
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    //if (picked != null && picked != selectedDate)
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,6 +33,10 @@ class _HomePageState extends State<HomePage> {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              RaisedButton(
+                child: Text("Selecione um dia"),
+                onPressed: () => {_selectDate(context)},
+              ),
               RaisedButton(
                 child: Text("Request"),
                 onPressed: () =>
