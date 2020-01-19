@@ -37,8 +37,8 @@ abstract class _HomeBase with Store {
     print(teste);
   }
 
-  String searchByThisDay(String title) {
-    getTitle("25 de janeiro").then((data) {
+  void searchByThisDay(String title) {
+    getTitle(title).then((data) {
       if (data.length > 0) {
         var formatedTitle = formatSuggestionTitle(data);
         getWikiPageContent(formatedTitle).then((data) {
@@ -56,7 +56,9 @@ abstract class _HomeBase with Store {
   }
 
   String extractFacts(var data) {
-    var unformattedText = data["query"]["pages"]["10686"]["revisions"][0]["*"];
+    var unformattedText =
+        data["query"]["pages"].values.toList()[0]["revisions"][0]["*"];
+
     var formatted = unformattedText
         .toString()
         .replaceAll(RegExp(r'\[+|\]+|{+|}+'), '')

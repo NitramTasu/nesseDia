@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'home_controller.dart';
 
@@ -13,6 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var homeController = HomeController();
+  final _formKey = GlobalKey<FormState>();
+  String _day = '1';
   final List<String> _months = [
     "Janeiro",
     "Fevereiro",
@@ -28,7 +31,7 @@ class _HomePageState extends State<HomePage> {
     "Dezembro"
   ];
   String _selectMonth;
-  String _selectedDate = "Janeiro";
+  String _selectedMonth = "Janeiro";
 
   // Future<Null> _selectDate(BuildContext context) async {
   //   print(new DateFormat.MMMM().format(new DateTime.now()));
@@ -49,20 +52,7 @@ class _HomePageState extends State<HomePage> {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              new DropdownButton<String>(
-                  value: _selectedDate,
-                  items: _months.map((String value) {
-                    return new DropdownMenuItem(
-                        value: value, child: new Text("${value}"));
-                  }).toList(),
-                  onChanged: (String value) {
-                    onMonthChange(value);
-                  }),
-              RaisedButton(
-                child: Text("Request"),
-                onPressed: () =>
-                    {homeController.searchByThisDay("25 de janeiro")},
-              ),
+              getForm(),
               Observer(
                 builder: (_) => Text('${homeController.text}'),
               )
@@ -73,7 +63,50 @@ class _HomePageState extends State<HomePage> {
 
   void onMonthChange(value) {
     setState(() {
-      _selectedDate = value;
+      _selectedMonth = value;
     });
+  }
+
+  void onDayChange(value) {
+    setState(() {
+      _day = value;
+    });
+  }
+
+  Widget getForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new TextFormField(
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              WhitelistingTextInputFormatter.digitsOnly
+            ],
+            onChanged: (String value) {
+              onDayChange(value);
+            },
+          ),
+          new DropdownButton<String>(
+              value: _selectedMonth,
+              items: _months.map((String value) {
+                return new DropdownMenuItem(
+                    value: value, child: new Text("${value}"));
+              }).toList(),
+              onChanged: (String value) {
+                onMonthChange(value);
+              }),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: RaisedButton(
+              child: Text("Request"),
+              onPressed: () =>
+                  {homeController.searchByThisDay("$_day de $_selectedMonth")},
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
