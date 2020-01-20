@@ -43,12 +43,33 @@ abstract class _HomeBase with Store {
         var formatedTitle = formatSuggestionTitle(data);
         getWikiPageContent(formatedTitle).then((data) {
           String facts = extractFacts(data);
+          List<String> nameList = extractNames(facts);
+          getImageNameList(nameList);
           loadText(facts);
         });
       }
     }, onError: (e) {
       print(e);
     });
+  }
+
+  List<String> extractNames(String facts) {
+    //var iReg = RegExp(
+    //r'([A-Z][a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+)[ ]*([A-Z][a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+)');
+
+    var iReg = RegExp(
+        r'([A-Z][a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+)[ ]*([A-Z][a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+)[ ]*(([A-Z][a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+)[ ]*)*');
+
+    return iReg.allMatches(facts).map((m) => m.group(0)).toList();
+  }
+
+  void getImageNameList(List<String> nameList) {
+    Dio dio = new Dio();
+    nameList.map((name) => {name = name.replaceAll(new RegExp(r'\s'), '_'));
+    print(nameList);
+
+    //homeRepository.searchImageName(dio, nameList[0]);
+    //print('teste');
   }
 
   String formatSuggestionTitle(var data) {

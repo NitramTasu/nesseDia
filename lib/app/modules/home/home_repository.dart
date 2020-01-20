@@ -6,6 +6,8 @@ class HomeRepository extends Disposable {
       'https://pt.wikipedia.org/w/api.php?action=opensearch&format=json&search=';
   final contentUrl =
       'https://pt.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=';
+  final imageNameUrl =
+      'https://pt.wikipedia.org/w/api.php?action=query&prop=images&format=json&titles=';
 
   Future<String> fetchPost(Dio client) async {
     try {
@@ -20,6 +22,15 @@ class HomeRepository extends Disposable {
   Future<List<dynamic>> searchTitle(Dio client, String search) async {
     try {
       final response = await client.get(searchUrl + search);
+      return response.data;
+    } on DioError catch (e) {
+      throw (e.message);
+    }
+  }
+
+  Future<List<dynamic>> searchImageName(Dio client, String name) async {
+    try {
+      final response = await client.get(imageNameUrl + name);
       return response.data;
     } on DioError catch (e) {
       throw (e.message);
