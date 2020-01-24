@@ -28,7 +28,7 @@ class HomeRepository extends Disposable {
     }
   }
 
-  Future<List<dynamic>> searchImageName(Dio client, String name) async {
+  Future<Map<String, dynamic>> searchImageName(Dio client, String name) async {
     try {
       final response = await client.get(imageNameUrl + name);
       return response.data;

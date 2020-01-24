@@ -44,8 +44,11 @@ abstract class _HomeBase with Store {
         getWikiPageContent(formatedTitle).then((data) {
           String facts = extractFacts(data);
           List<String> nameList = extractNames(facts);
-          getImageNameList(nameList);
-          loadText(facts);
+          Future<List<String>> response = getImageNameList(nameList);
+          response.then((imageNameList){
+            loadText(facts);
+          });
+          
         });
       }
     }, onError: (e) {
@@ -63,13 +66,19 @@ abstract class _HomeBase with Store {
     return iReg.allMatches(facts).map((m) => m.group(0)).toList();
   }
 
-  void getImageNameList(List<String> nameList) {
+  Future<List<String>> getImageNameList(List<String> nameList) async{
     Dio dio = new Dio();
-    nameList.map((name) => {name = name.replaceAll(new RegExp(r'\s'), '_'));
-    print(nameList);
-
-    //homeRepository.searchImageName(dio, nameList[0]);
-    //print('teste');
+    List<String> imageNameList = [];
+    for(var i = 0; i < nameList.length; i++){
+      String formattedName = nameList[i].trim().replaceAll(new RegExp(r'\s'), '_');
+      try{
+        Map<String, dynamic> response = await homeRepository.searchImageName(dio, formattedName);
+        imageNameList.add(response["query"]["pages"].values.first["images"][3].values.last.toString());
+      }catch (err){
+        //print(err);
+      }
+    } 
+    return imageNameList;
   }
 
   String formatSuggestionTitle(var data) {
